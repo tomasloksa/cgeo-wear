@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:label="c:geo wear bridge"
+        android:allowBackup="true">
+        <!-- M2: activity with ACTION_VIEW + scheme="geo" intent filter, so this
+             app appears in c:geo's "Navigate with" menu. -->
+    </application>
+
+</manifest>
