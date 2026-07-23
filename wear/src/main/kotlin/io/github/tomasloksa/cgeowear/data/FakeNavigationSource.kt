@@ -8,6 +8,7 @@ import kotlin.math.sin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Simulates a walk towards a hardcoded cache at ~1.2 m/s with a slight
@@ -45,7 +46,7 @@ class FakeNavigationSource(
                 lon = newLon
                 step++
             }
-            delay(1_000)
+            delay(1_000.milliseconds)
         }
     }
 

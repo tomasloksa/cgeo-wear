@@ -149,6 +149,15 @@ c:geo ──geo:/intent──▶ bridge (phone)                      watch
 
 Development loop: emulator pair for daily work, real watch for compass/battery validation.
 
+### Backlog (found during testing)
+
+- **Calibration indicator** *(M1 field test, 2026-07-23)*: on first run on a real watch the
+  heading was way off until the magnetometer was calibrated. The sensor reports its
+  calibration state via `onAccuracyChanged` (`SENSOR_STATUS_ACCURACY_UNRELIABLE`/`LOW`/
+  `MEDIUM`/`HIGH`) — `HeadingProvider` already gets the callback and ignores it. Do what
+  the stock compass app does: carry accuracy in `Heading`, and while it's below medium show
+  a "move your wrist in a figure-8" overlay instead of trusting the arrow.
+
 ---
 
 ## 7. Open questions for the c:geo team

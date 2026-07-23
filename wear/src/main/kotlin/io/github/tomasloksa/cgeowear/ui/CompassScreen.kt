@@ -30,13 +30,14 @@ import kotlin.math.min
 private val RingColor = Color(0xFF444444)
 private val NorthColor = Color(0xFFCC4444)
 private val ArrowColor = Color(0xFF6DD58C)
+private val CalibrateColor = Color(0xFFE0A030)
 
 /**
  * The whole v1 screen: compass ring rotating with the wearer's heading,
  * an arrow pointing at the cache, distance in the middle.
  */
 @Composable
-fun CompassScreen(state: NavState?, heading: Heading?) {
+fun compassScreen(state: NavState?, heading: Heading?) {
     MaterialTheme {
         Box(
             modifier = Modifier
@@ -48,7 +49,12 @@ fun CompassScreen(state: NavState?, heading: Heading?) {
                 Text("Waiting for target…", color = Color.Gray)
             } else {
                 val azimuth = heading?.azimuthDeg ?: 0f
-                CompassRing(azimuthDeg = azimuth, targetBearingDeg = state.tick.bearingDeg)
+                val needsCalibration = heading?.calibrated == false
+                CompassRing(
+                    azimuthDeg = azimuth,
+                    targetBearingDeg = state.tick.bearingDeg,
+                    showArrow = !needsCalibration,
+                )
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = formatDistance(state.tick.distanceMeters),
@@ -66,7 +72,18 @@ fun CompassScreen(state: NavState?, heading: Heading?) {
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray,
                     )
-                    if (heading?.simulated == true) {
+                    if (needsCalibration) {
+                        Text(
+                            text = "Calibrate compass",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = CalibrateColor,
+                        )
+                        Text(
+                            text = "move wrist in a figure-8",
+                            fontSize = 10.sp,
+                            color = CalibrateColor,
+                        )
+                    } else if (heading?.simulated == true) {
                         Text(
                             text = "sim heading",
                             fontSize = 10.sp,
@@ -82,7 +99,7 @@ fun CompassScreen(state: NavState?, heading: Heading?) {
 
 /** Ring + cardinal marks rotate with the device so marks point at real directions. */
 @Composable
-private fun CompassRing(azimuthDeg: Float, targetBearingDeg: Float) {
+private fun CompassRing(azimuthDeg: Float, targetBearingDeg: Float, showArrow: Boolean = true) {
     Canvas(modifier = Modifier.fillMaxSize()) {
         val radius = min(size.width, size.height) / 2f - 10.dp.toPx()
 
@@ -108,8 +125,11 @@ private fun CompassRing(azimuthDeg: Float, targetBearingDeg: Float) {
         }
 
         // Arrow to the target, relative to where the wearer is facing.
-        rotate(degrees = targetBearingDeg - azimuthDeg) {
-            drawTargetArrow(radius)
+        // Hidden while the compass is uncalibrated — a wrong arrow is worse than none.
+        if (showArrow) {
+            rotate(degrees = targetBearingDeg - azimuthDeg) {
+                drawTargetArrow(radius)
+            }
         }
     }
 }

@@ -13,9 +13,18 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
-/** Device azimuth (deg clockwise from true-ish north) and whether it is simulated. */
-data class Heading(val azimuthDeg: Float, val simulated: Boolean)
+/**
+ * Device azimuth (deg clockwise from true-ish north) and whether it is simulated.
+ * [calibrated] is false while the magnetometer reports low/unreliable accuracy —
+ * the arrow can't be trusted until the wearer does a figure-8 motion.
+ */
+data class Heading(
+    val azimuthDeg: Float,
+    val simulated: Boolean,
+    val calibrated: Boolean = true,
+)
 
 /**
  * Wraps TYPE_ROTATION_VECTOR as a cold flow. The listener is registered only
@@ -47,10 +56,16 @@ class HeadingProvider(context: Context) {
                 SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
                 SensorManager.getOrientation(rotationMatrix, orientation)
                 val azimuthRad = orientation[0].toDouble()
-                smoothSin += SMOOTHING * (sin(azimuthRad) - smoothSin)
-                smoothCos += SMOOTHING * (cos(azimuthRad) - smoothCos)
+                smoothSin += RESPONSIVENESS * (sin(azimuthRad) - smoothSin)
+                smoothCos += RESPONSIVENESS * (cos(azimuthRad) - smoothCos)
                 val smoothedDeg = Math.toDegrees(atan2(smoothSin, smoothCos))
-                trySend(Heading(normalize(smoothedDeg.toFloat()), simulated = false))
+                trySend(
+                    Heading(
+                        azimuthDeg = normalize(smoothedDeg.toFloat()),
+                        simulated = false,
+                        calibrated = event.accuracy >= SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM,
+                    ),
+                )
             }
 
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
@@ -61,12 +76,12 @@ class HeadingProvider(context: Context) {
         }
 
         val fallback = launch {
-            delay(SENSOR_TIMEOUT_MS)
+            delay(SENSOR_TIMEOUT_MS.milliseconds)
             var azimuth = 0f
             while (!gotRealEvent) {
                 trySend(Heading(normalize(azimuth), simulated = true))
                 azimuth += SIM_SWEEP_DEG_PER_TICK
-                delay(SIM_TICK_MS)
+                delay(SIM_TICK_MS.milliseconds)
             }
         }
 
@@ -79,7 +94,7 @@ class HeadingProvider(context: Context) {
     private fun normalize(deg: Float): Float = ((deg % 360f) + 360f) % 360f
 
     private companion object {
-        const val SMOOTHING = 0.25
+        const val RESPONSIVENESS = 0.35
         const val SENSOR_TIMEOUT_MS = 3_000L
         const val SIM_TICK_MS = 100L
         const val SIM_SWEEP_DEG_PER_TICK = 1.5f // one full turn per 24 s

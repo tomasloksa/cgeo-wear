@@ -7,7 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.tomasloksa.cgeowear.data.FakeNavigationSource
 import io.github.tomasloksa.cgeowear.sensor.HeadingProvider
-import io.github.tomasloksa.cgeowear.ui.CompassScreen
+import io.github.tomasloksa.cgeowear.ui.compassScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
             // unregisters) whenever the activity leaves STARTED.
             val navState by navigationSource.state.collectAsStateWithLifecycle(initialValue = null)
             val heading by headingProvider.heading.collectAsStateWithLifecycle(initialValue = null)
-            CompassScreen(state = navState, heading = heading)
+            compassScreen(state = navState, heading = heading)
         }
     }
 }
