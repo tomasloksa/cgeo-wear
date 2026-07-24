@@ -83,12 +83,6 @@ fun compassScreen(state: NavState?, heading: Heading?) {
                             fontSize = 10.sp,
                             color = CalibrateColor,
                         )
-                    } else if (heading?.simulated == true) {
-                        Text(
-                            text = "sim heading",
-                            fontSize = 10.sp,
-                            color = Color(0xFF886600),
-                        )
                     }
                 }
             }
