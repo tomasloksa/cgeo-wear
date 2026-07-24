@@ -21,7 +21,7 @@ data class NavTick(
 
 data class NavState(
     val target: NavTarget,
-    val tick: NavTick,
+    val tick: NavTick? = null,
 )
 
 /**

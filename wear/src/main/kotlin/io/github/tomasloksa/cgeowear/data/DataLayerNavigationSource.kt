@@ -26,14 +26,9 @@ class DataLayerNavigationSource(context: Context) : NavigationSource {
         var tick: NavTick? = null
 
         fun emitIfReady() {
-            val currentTarget = target
-            val currentTick = tick
-            if (currentTarget != null && currentTick != null) {
-                Log.d(TAG, "emitting NavState: ${currentTarget.name} ${currentTick.distanceMeters}m")
-                trySend(NavState(currentTarget, currentTick))
-            } else {
-                Log.d(TAG, "not ready yet: target=${currentTarget != null}, tick=${currentTick != null}")
-            }
+            val currentTarget = target ?: return
+            Log.d(TAG, "emitting NavState: ${currentTarget.name} tick=${tick?.distanceMeters}")
+            trySend(NavState(currentTarget, tick))
         }
 
         val dataListener = DataClient.OnDataChangedListener { events ->

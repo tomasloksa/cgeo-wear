@@ -49,19 +49,28 @@ fun compassScreen(state: NavState?, heading: Heading?) {
                 Text("Waiting for target…", color = Color.Gray)
             } else {
                 val azimuth = heading?.azimuthDeg ?: 0f
+                val tick = state.tick
                 val needsCalibration = heading?.calibrated == false
                 CompassRing(
                     azimuthDeg = azimuth,
-                    targetBearingDeg = state.tick.bearingDeg,
-                    showArrow = !needsCalibration,
+                    targetBearingDeg = tick?.bearingDeg ?: 0f,
+                    showArrow = tick != null && !needsCalibration,
                 )
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = formatDistance(state.tick.distanceMeters),
-                        style = MaterialTheme.typography.displayMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                    )
+                    if (tick != null) {
+                        Text(
+                            text = formatDistance(tick.distanceMeters),
+                            style = MaterialTheme.typography.displayMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                        )
+                    } else {
+                        Text(
+                            text = "Acquiring GPS…",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Gray,
+                        )
+                    }
                     Text(
                         text = state.target.name,
                         style = MaterialTheme.typography.bodyMedium,
@@ -72,7 +81,7 @@ fun compassScreen(state: NavState?, heading: Heading?) {
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray,
                     )
-                    if (needsCalibration) {
+                    if (tick != null && needsCalibration) {
                         Text(
                             text = "Calibrate compass",
                             style = MaterialTheme.typography.bodySmall,
