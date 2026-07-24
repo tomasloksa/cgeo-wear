@@ -1,6 +1,3 @@
-// Phone-side bridge app (M2): receives the navigation target from c:geo via
-// a geo: intent, owns GPS, pushes target + distance/bearing ticks to the
-// watch over the Data Layer. Stub module for now — only the app shell exists.
 plugins {
     alias(libs.plugins.android.application)
 }
@@ -11,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "io.github.tomasloksa.cgeowear"
-        minSdk = 26 // matches c:geo for a painless later merge
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "0.1.0"
@@ -33,5 +30,6 @@ android {
 
 dependencies {
     implementation(project(":common"))
-    // M2: libs.play.services.wearable
+    implementation(libs.play.services.wearable)
+    implementation(libs.play.services.location)
 }

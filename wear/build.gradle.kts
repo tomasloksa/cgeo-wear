@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.activity.compose)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.play.services.wearable)
 
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.wear.compose.ui.tooling)

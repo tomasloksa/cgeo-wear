@@ -11,9 +11,22 @@ ADB="$ANDROID_HOME/platform-tools/adb"
 
 bold() { printf '\033[1m%s\033[0m\n' "$*"; }
 
-# A real watch = any adb device that is not an emulator.
+online_devices() { "$ADB" devices | awk 'NR>1 && $2=="device" {print $1}'; }
+
+is_watch() {
+    "$ADB" -s "$1" shell getprop ro.build.characteristics 2>/dev/null | tr -d '\r' | grep -q watch
+}
+
+# A watch = a connected device that reports the 'watch' characteristic, so a
+# phone on the same adb server is never selected.
 watch_serial() {
-    "$ADB" devices | awk 'NR>1 && $2=="device" && $1 !~ /^emulator-/ {print $1; exit}'
+    local serial
+    for serial in $(online_devices); do
+        if is_watch "$serial"; then
+            echo "$serial"
+            return
+        fi
+    done
 }
 
 SERIAL="$(watch_serial)"

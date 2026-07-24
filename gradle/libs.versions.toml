@@ -8,6 +8,7 @@ activityCompose = "1.13.0"
 lifecycle = "2.9.1"
 wearOngoing = "1.1.0"              # M3: Ongoing Activity
 playServicesWearable = "20.0.1"    # M2: Data Layer (wear + mobile)
+playServicesLocation = "21.3.0"    # M2: FusedLocation on the phone bridge
 junit = "4.13.2"
 
 [libraries]
@@ -28,6 +29,7 @@ lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-ru
 
 wear-ongoing = { group = "androidx.wear", name = "wear-ongoing", version.ref = "wearOngoing" }
 play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 
